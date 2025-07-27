@@ -16,7 +16,7 @@ function App() {
   const [newItemName, setNewItemName] = useState('');
   const [newItemDescription, setNewItemDescription] = useState('');
   const [editItemId, setEditItemId] = useState(null);
-  const [editItemName, setEditItemName] = useState('');
+  const [editItemName, setEditItemName] = '';
   const [editItemDescription, setEditItemDescription] = '';
 
   // State for general messages (e.g., success/error from CRUD operations)
@@ -241,7 +241,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 p-4 font-sans flex flex-col items-center">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-2xl w-full">
         <h1 className="text-4xl font-extrabold text-center text-indigo-700 mb-8">
-          React & Node.js App
+          REMWASTE Challenge {/* Changed title here */}
         </h1>
 
         {/* Global Application Message Display */}
@@ -453,4 +453,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
