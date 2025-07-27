@@ -23,7 +23,8 @@ function App() {
   const [appMessage, setAppMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
-  const API_BASE_URL = 'https://my-app-backend-6kr6.onrender.com';
+  // CORRECTED: Added /api to the base URL
+  const API_BASE_URL = 'https://my-app-backend-6kr6.onrender.com/api';
 
   // --- Authentication Functions ---
 
@@ -34,6 +35,7 @@ function App() {
     setAppMessage('');
 
     try {
+      // The fetch URL will now correctly be https://my-app-backend-6kr6.onrender.com/api/login
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
