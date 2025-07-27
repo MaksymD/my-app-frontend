@@ -291,7 +291,7 @@ function App() {
               </p>
             )}
             <p className="mt-4 text-center text-sm text-gray-500">
-              Try with: <span className="font-semibold">testuser/password123</span> or <span className="font-semibold">admin/adminpassword</span>
+              Log-in with: <span className="font-semibold">admin/adminpassword</span>
             </p>
           </div>
         ) : (
