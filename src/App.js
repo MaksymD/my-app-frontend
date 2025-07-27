@@ -23,7 +23,6 @@ function App() {
   const [appMessage, setAppMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
-  // CORRECTED: Added /api to the base URL
   const API_BASE_URL = 'https://my-app-backend-6kr6.onrender.com/api';
 
   // --- Authentication Functions ---
@@ -35,7 +34,6 @@ function App() {
     setAppMessage('');
 
     try {
-      // The fetch URL will now correctly be https://my-app-backend-6kr6.onrender.com/api/login
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
@@ -248,14 +246,17 @@ function App() {
 
         {/* Global Application Message Display */}
         {appMessage && (
-          <div className={`p-3 mb-4 rounded-md text-center ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div
+            data-testid="app-message" // Added data-testid
+            className={`p-3 mb-4 rounded-md text-center ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+          >
             {appMessage}
           </div>
         )}
 
         {/* Authentication Section */}
         {!token ? (
-          <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+          <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-gray-50" data-testid="login-section"> {/* Added data-testid */}
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Login</h2>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
@@ -263,6 +264,7 @@ function App() {
                 <input
                   type="text"
                   id="username"
+                  data-testid="login-username-input" // Added data-testid
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   value={loginUsername}
                   onChange={(e) => setLoginUsername(e.target.value)}
@@ -274,6 +276,7 @@ function App() {
                 <input
                   type="password"
                   id="password"
+                  data-testid="login-password-input" // Added data-testid
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
@@ -282,13 +285,17 @@ function App() {
               </div>
               <button
                 type="submit"
+                data-testid="login-button" // Added data-testid
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Login
               </button>
             </form>
             {loginMessage && (
-              <p className={`mt-4 text-center ${loginMessage.includes('successful') ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                data-testid="login-message" // Added data-testid
+                className={`mt-4 text-center ${loginMessage.includes('successful') ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {loginMessage}
               </p>
             )}
@@ -298,12 +305,13 @@ function App() {
           </div>
         ) : (
           // Logged in view
-          <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-indigo-50">
-            <h2 className="text-2xl font-semibold text-indigo-800 mb-4 text-center">
+          <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-indigo-50" data-testid="logged-in-section"> {/* Added data-testid */}
+            <h2 className="text-2xl font-semibold text-indigo-800 mb-4 text-center" data-testid="welcome-message"> {/* Added data-testid */}
               Welcome, {username}!
             </h2>
             <button
               onClick={handleLogout}
+              data-testid="logout-button" // Added data-testid
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               Logout
@@ -313,11 +321,11 @@ function App() {
 
         {/* Items Section (visible only when logged in) */}
         {token && (
-          <div>
+          <div data-testid="items-section"> {/* Added data-testid */}
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Your Items</h2>
 
             {/* Add New Item Form */}
-            <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="mb-8 p-6 border border-gray-200 rounded-lg bg-gray-50" data-testid="add-item-form"> {/* Added data-testid */}
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Add New Item</h3>
               <form onSubmit={handleAddItem} className="space-y-4">
                 <div>
@@ -325,6 +333,7 @@ function App() {
                   <input
                     type="text"
                     id="newItemName"
+                    data-testid="new-item-name-input" // Added data-testid
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
@@ -337,6 +346,7 @@ function App() {
                   <textarea
                     id="newItemDescription"
                     rows="3"
+                    data-testid="new-item-description-input" // Added data-testid
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     value={newItemDescription}
                     onChange={(e) => setNewItemDescription(e.target.value)}
@@ -346,6 +356,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
+                  data-testid="add-item-button" // Added data-testid
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
                   Add Item
@@ -355,19 +366,21 @@ function App() {
 
             {/* Items List */}
             {items.length === 0 ? (
-              <p className="text-center text-gray-500 text-lg">No items found. Add one above!</p>
+              // Fixed: Moved JSX comment to a new line to avoid compilation error
+              <p className="text-center text-gray-500 text-lg" data-testid="no-items-message">No items found. Add one above!</p>
             ) : (
-              <ul className="space-y-4">
+              <ul className="space-y-4" data-testid="items-list"> {/* Added data-testid */}
                 {items.map((item) => (
-                  <li key={item.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center">
+                  <li key={item.id} data-testid={`item-${item.id}`} className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center"> {/* Added data-testid */}
                     {editItemId === item.id ? (
                       // Edit form for the selected item
-                      <form onSubmit={handleEditItem} className="w-full space-y-3">
+                      <form onSubmit={handleEditItem} className="w-full space-y-3" data-testid={`edit-item-form-${item.id}`}> {/* Added data-testid */}
                         <div>
                           <label htmlFor={`editName-${item.id}`} className="sr-only">Edit Name</label>
                           <input
                             type="text"
                             id={`editName-${item.id}`}
+                            data-testid={`edit-item-name-input-${item.id}`} // Added data-testid
                             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             value={editItemName}
                             onChange={(e) => setEditItemName(e.target.value)}
@@ -379,7 +392,8 @@ function App() {
                           <textarea
                             id={`editDescription-${item.id}`}
                             rows="2"
-                            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            data-testid={`edit-item-description-input-${item.id}`} // Added data-testid
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             value={editItemDescription}
                             onChange={(e) => setEditItemDescription(e.target.value)}
                             placeholder="Edit item description"
@@ -388,6 +402,7 @@ function App() {
                         <div className="flex space-x-2">
                           <button
                             type="submit"
+                            data-testid={`save-item-button-${item.id}`} // Added data-testid
                             className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                           >
                             Save
@@ -395,6 +410,7 @@ function App() {
                           <button
                             type="button"
                             onClick={cancelEditing}
+                            data-testid={`cancel-edit-button-${item.id}`} // Added data-testid
                             className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             Cancel
@@ -405,18 +421,20 @@ function App() {
                       // Display item details
                       <>
                         <div className="flex-1 mb-4 md:mb-0">
-                          <h4 className="text-xl font-semibold text-gray-900">{item.name} (ID: {item.id})</h4>
-                          <p className="text-gray-600 mt-1">{item.description}</p>
+                          <h4 className="text-xl font-semibold text-gray-900" data-testid={`item-name-${item.id}`}>{item.name} (ID: {item.id})</h4> {/* Added data-testid */}
+                          <p className="text-gray-600 mt-1" data-testid={`item-description-${item.id}`}>{item.description}</p> {/* Added data-testid */}
                         </div>
                         <div className="flex space-x-3">
                           <button
                             onClick={() => startEditing(item)}
+                            data-testid={`edit-item-button-${item.id}`} // Added data-testid
                             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDeleteItem(item.id)}
+                            data-testid={`delete-item-button-${item.id}`} // Added data-testid
                             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                           >
                             Delete
