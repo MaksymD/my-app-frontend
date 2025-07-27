@@ -23,7 +23,7 @@ function App() {
   const [appMessage, setAppMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = 'https://my-app-backend-6kr6.onrender.com';
 
   // --- Authentication Functions ---
 
