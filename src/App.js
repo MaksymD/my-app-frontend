@@ -1,5 +1,5 @@
 // App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 
 function App() {
   // State for user authentication (token and username)
@@ -16,14 +16,34 @@ function App() {
   const [newItemName, setNewItemName] = useState('');
   const [newItemDescription, setNewItemDescription] = useState('');
   const [editItemId, setEditItemId] = useState(null);
-  const [editItemName, setEditItemName] = '';
-  const [editItemDescription, setEditItemDescription] = '';
+  const [editItemName, setEditItemName] = useState('');
+  const [editItemDescription, setEditItemDescription] = useState('');
 
   // State for general messages (e.g., success/error from CRUD operations)
   const [appMessage, setAppMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
+  // Ref to store the timeout ID for clearing app messages
+  const appMessageTimeoutRef = useRef(null);
+
   const API_BASE_URL = 'https://my-app-backend-6kr6.onrender.com/api';
+
+  // Helper to set and clear app messages after a delay
+  const showAppMessage = (message, type, duration = 5000) => {
+    // Clear any existing timeout to prevent previous messages from clearing prematurely
+    if (appMessageTimeoutRef.current) {
+      clearTimeout(appMessageTimeoutRef.current);
+    }
+
+    setAppMessage(message);
+    setMessageType(type);
+
+    // Set a new timeout to clear the message
+    appMessageTimeoutRef.current = setTimeout(() => {
+      setAppMessage('');
+      setMessageType('');
+    }, duration);
+  };
 
   // --- Authentication Functions ---
 
@@ -31,7 +51,7 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginMessage('');
-    setAppMessage('');
+    setAppMessage(''); // Clear app message on login attempt
 
     try {
       const response = await fetch(`${API_BASE_URL}/login`, {
@@ -70,7 +90,10 @@ function App() {
     localStorage.removeItem('username'); // Clear username from local storage
     setItems([]); // Clear items on logout
     setLoginMessage('Logged out successfully.');
-    setAppMessage('');
+    setAppMessage(''); // Clear app message on logout
+    if (appMessageTimeoutRef.current) { // Clear any pending message timeouts
+        clearTimeout(appMessageTimeoutRef.current);
+    }
   };
 
   // --- Item Management Functions ---
@@ -91,30 +114,26 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         setItems(data);
-        setAppMessage(''); // Clear any previous app messages
+        // Do NOT clear appMessage here, let showAppMessage handle it
       } else if (response.status === 401 || response.status === 403) {
-        // Token expired or invalid, force logout
         handleLogout();
         setLoginMessage('Session expired. Please log in again.');
       } else {
         const errorData = await response.json();
-        setAppMessage(`Failed to fetch items: ${errorData.message}`);
-        setMessageType('error');
+        showAppMessage(`Failed to fetch items: ${errorData.message}`, 'error');
       }
     } catch (error) {
       console.error('Fetch items error:', error);
-      setAppMessage('An error occurred while fetching items.');
-      setMessageType('error');
+      showAppMessage('An error occurred while fetching items.', 'error');
     }
   };
 
   // Add a new item
   const handleAddItem = async (e) => {
     e.preventDefault();
-    setAppMessage('');
+    setAppMessage(''); // Clear previous message immediately
     if (!newItemName || !newItemDescription) {
-      setAppMessage('Please enter both name and description for the new item.');
-      setMessageType('error');
+      showAppMessage('Please enter both name and description for the new item.', 'error');
       return;
     }
 
@@ -131,19 +150,16 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        setAppMessage('Item added successfully!');
-        setMessageType('success');
+        showAppMessage('Item added successfully!', 'success');
         setNewItemName('');
         setNewItemDescription('');
         fetchItems(); // Refresh the list of items
       } else {
-        setAppMessage(`Failed to add item: ${data.message || 'Unknown error'}`);
-        setMessageType('error');
+        showAppMessage(`Failed to add item: ${data.message || 'Unknown error'}`, 'error');
       }
     } catch (error) {
       console.error('Add item error:', error);
-      setAppMessage('An error occurred while adding the item.');
-      setMessageType('error');
+      showAppMessage('An error occurred while adding the item.', 'error');
     }
   };
 
@@ -152,7 +168,7 @@ function App() {
     setEditItemId(item.id);
     setEditItemName(item.name);
     setEditItemDescription(item.description);
-    setAppMessage(''); // Clear any previous messages
+    setAppMessage(''); // Clear any previous messages when starting edit
   };
 
   // Cancel editing
@@ -165,10 +181,9 @@ function App() {
   // Save edited item
   const handleEditItem = async (e) => {
     e.preventDefault();
-    setAppMessage('');
+    setAppMessage(''); // Clear previous message immediately
     if (!editItemName && !editItemDescription) {
-      setAppMessage('Please enter at least a name or description to update.');
-      setMessageType('error');
+      showAppMessage('Please enter at least a name or description to update.', 'error');
       return;
     }
 
@@ -185,24 +200,21 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        setAppMessage('Item updated successfully!');
-        setMessageType('success');
+        showAppMessage('Item updated successfully!', 'success');
         cancelEditing(); // Exit edit mode
         fetchItems(); // Refresh the list of items
       } else {
-        setAppMessage(`Failed to update item: ${data.message || 'Unknown error'}`);
-        setMessageType('error');
+        showAppMessage(`Failed to update item: ${data.message || 'Unknown error'}`, 'error');
       }
     } catch (error) {
       console.error('Edit item error:', error);
-      setAppMessage('An error occurred while updating the item.');
-      setMessageType('error');
+      showAppMessage('An error occurred while updating the item.', 'error');
     }
   };
 
   // Delete an item
   const handleDeleteItem = async (id) => {
-    setAppMessage('');
+    setAppMessage(''); // Clear previous message immediately
     if (!window.confirm('Are you sure you want to delete this item?')) {
       return; // User cancelled
     }
@@ -218,17 +230,14 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        setAppMessage('Item deleted successfully!');
-        setMessageType('success');
+        showAppMessage('Item deleted successfully!', 'success');
         fetchItems(); // Refresh the list of items
       } else {
-        setAppMessage(`Failed to delete item: ${data.message || 'Unknown error'}`);
-        setMessageType('error');
+        showAppMessage(`Failed to delete item: ${data.message || 'Unknown error'}`, 'error');
       }
     } catch (error) {
       console.error('Delete item error:', error);
-      setAppMessage('An error occurred while deleting the item.');
-      setMessageType('error');
+      showAppMessage('An error occurred while deleting the item.', 'error');
     }
   };
 
@@ -453,4 +462,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
